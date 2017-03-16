@@ -1,0 +1,80 @@
+Git: Diff Between {Working Dir, Staged Area, Last Commit}
+
+By Xah Lee. Date: 2012-08-08. Last updated: 2017-01-07.
+This page is a git tutorial for finding differences in last commit or various areas of git.
+
+There are 3 major concepts of places:
+
+Working Directory → files in your working directory.
+Staging Area (aka cache, index) . → a temp area that git add is placed into.
+HEAD → A reference to a specific commit (think of it as a variable). Normally, it points to the last commit in local repository. (that is, after you did git commit). 〔►see Git: What's HEAD〕
+All are local on your disk.
+
+One important concept is Commit ID. Every commit has a ID. The commit id is a 40 digits hexadecimal, for example: 3b6ea398cc2d69212b04c29f06b8d15c0af34e34.
+
+How to get commit ID?
+Type git log -3 to show the last 3 commit's commit IDs.
+
+git diff Between {Working Dir, Staged Area, Last Commit}
+
+How to diff between {working dir, staging area}?
+# diff working dir, staging area
+git diff --color
+# diff working dir, staging area, 1 file
+git diff --color filename
+How to diff between {staging area, last commit}?
+# diff staging area, last commit. (--staged is same as --cached)
+git diff --color --staged commitID
+How to diff between {last commit, working dir}?
+First, use git log to get a commit ID.
+
+# diff last commit, working dir
+git diff --color commitID
+Git Diff Between 2 Commits
+
+How to diff between 2 commits in the same branch?
+First do
+
+git log file_name
+
+to find the commits IDs. Then, do
+
+git diff commit_ID_1 commit_ID_2 file_name
+
+git diff 3d5cf 5aa95 myfilename
+You only need to type the first few characters of commit id.
+
+git status: summary of {last commit, staging area, working dir}
+
+How to find what files are changed?
+git status . will report changes between {staging area, last commit} and {staging area, working dir}.
+
+# show changes between {staging area, last commit} and {staging area, working dir}
+git status .
+Here's a sample output of git status .:
+
+◆ git status .
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#       modified:   ../../ergoemacs_org/emacs/blog.html
+#       modified:   ../../ergoemacs_org/emacs/blog.xml
+#
+# Changes not staged for commit:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#       modified:   ../../ergoemacs_org/emacs/elisp_eval_lisp_code.html
+#       modified:   ../../ergoemacs_org/emacs/elisp_function_eval_and_doc_lookup.html
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#       ../../ergoemacs_org/emacs/i/emacs_describe-function.png
+#       ../js/earth_globe_JavaScript.js
+The first section “# Changes to be committed:” is the diff between {staging area, last commit}.
+
+The second section “# Changes not staged for commit:” is the diff between {working dir, staging area}.
+
+The 3rd section “# Untracked files:” is also the diff between {working dir, staging

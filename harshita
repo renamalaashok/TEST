@@ -1,0 +1,57 @@
+How to see diff between working directory and staging index?
+
+Ask Question
+
+up vote
+3
+down vote
+favorite
+3
+We can see difference between repository and working directory with:
+
+git diff
+We can see difference between repository and staging index with:
+
+git diff --staged
+But how do we see difference between working directory and staging index?
+
+git git-diff
+shareimprove this question
+asked Mar 28 '15 at 16:09
+
+matori82
+71041644
+add a comment
+1 Answer
+active oldest votes
+up vote
+5
+down vote
+accepted
+Actually, git diff is between index and working tree
+
+git diff HEAD is between repo and working tree.
+
+See 365git.tumblr.com post:
+
+git diffs
+
+shareimprove this answer
+answered Mar 28 '15 at 16:13
+
+VonC
+665k21419532078
+  	 	
+I don't understand this because right now I have "file.txt" in repository with content "1". Then I modify that file in my working directory to have content "12" but WITHOUT adding it to staging index. Then when I enter "git diff" I DO get difference shown in console. So there is nothing in staging index but I still get the difference between repository and working directory. I am really confused now. – matori82 Mar 28 '15 at 16:53
+  	 	
+@matori82 by default, index is equal to repo. Index differs from repo only when you start adding file to it. – VonC Mar 28 '15 at 16:59
+  	 	
+Ah... I didn't know that. Guess I will have to dive more into git internals to get information like this... Thank you. – matori82 Mar 28 '15 at 18:39
+  	 	
+However, the logic of this command seems to be even more complex. Eg. if I have one file in index and one modified file in working directory, when I do the "git diff" then difference is shown for the file in working directory but the difference for file in staging index is not shown at all! This is really really confusing now... – matori82 Mar 28 '15 at 19:01 
+  	 	
+@matori82 That is expected: the goal of git diff is, by default,to show what has not yet been tracked (added to the index or committed). What you had to the index is no longer shown by default, because you already reviewed it and decided to make it part of the next commit. – VonC Mar 28 '15 at 19:44 
+show 2 more comments
+Your Answer
+
+

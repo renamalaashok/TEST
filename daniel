@@ -1,0 +1,111 @@
+Setup Configuration:-
+--------------------------
+Raid-Head: 2U12
+Controllers: SAS
+Build version: GL220P009-03
+Branding: HP 
+##############
+
+
+Followed below two scenarios to verify the Defect:-
+----------------------------------------------------------------
+Scenario1:-
+-------------
+1.Created Pool-A with size 591.9GB [ OverCommit Enabled ]
+2.Created Pool-B with size 591.9GB [ OverCommit Diabled ]
+3.Created a volume from Pool-A with size 589.6GB
+4.Created a volume from Pool-B with size 589.6GB
+5.Started Copying data into volumes and got below events when filled the volume with data
+6.Got 462 evetns with " INFORMATIONAL " type for all low,mid and high thresholds  in oth  Controller-A & Controller-B[ No Warning, Criticla Events Generated ]
+7.Recorded the Results
+
+# show pools
+Management Controller is refreshing stale data. Please wait...
+Waiting for system to finish computing health...
+Name Serial Number                    Class    Total Size Avail  Snap Size OverCommit  Disk Groups Volumes  Low Thresh  Mid Thresh  High Thresh  Sec Fmt   Health     Reason
+  Action
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+A    00c0ff192771000065f1b75801000000 Virtual  591.9GB    40.5GB 0B        Enabled     1           1        50.00 %     75.00 %     76.00 %      512n      OK
+
+B    00c0ff19ed8b000079f1b75801000000 Virtual  591.9GB    71.3MB 0B        Disabled    1           1        50.00 %     75.00 %     76.00 %      512n      OK
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Success: Command completed successfully. (2017-03-02 11:50:44)
+
+# show events last 7
+2017-03-02 11:37:48 [462]  #A182:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller A INFORMATIONAL A virtual pool exceeded its high page threshold of 76%. (pool: A, SN: 00c0ff192771000065f1b75801000000) (amount used: 107255 of 141124 pages, or 76%)
+2017-03-02 11:37:40 [462]  #B214:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller B INFORMATIONAL A virtual pool exceeded its high page threshold of 76%. (pool: B, SN: 00c0ff19ed8b000079f1b75801000000) (amount used: 107255 of 141124 pages, or 76%)
+2017-03-02 11:37:00 [462]  #A181:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller A INFORMATIONAL A virtual pool exceeded its mid page threshold of 75%. (pool: A, SN: 00c0ff192771000065f1b75801000000) (amount used: 105844 of 141124 pages, or 75%)
+2017-03-02 11:36:51 [462]  #B213:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller B INFORMATIONAL A virtual pool exceeded its mid page threshold of 75%. (pool: B, SN: 00c0ff19ed8b000079f1b75801000000) (amount used: 105844 of 141124 pages, or 75%)
+2017-03-02 11:18:12 [462]  #A180:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller A INFORMATIONAL A virtual pool exceeded its low page threshold of 50%. (pool: A, SN: 00c0ff192771000065f1b75801000000) (amount used: 70563 of 141124 pages, or 50%)
+2017-03-02 11:17:54 [462]  #B212:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller B INFORMATIONAL A virtual pool exceeded its low page threshold of 50%. (pool: B, SN: 00c0ff19ed8b000079f1b75801000000) (amount used: 70563 of 141124 pages, or 50%)
+2017-03-02 10:50:00 [473]  #A179:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller A INFORMATIONAL A volume is using more than its threshold percentage of its virtual pool. (pool: A, SN: 00c0ff192771000065f1b75801000000) (volume: Over_Enable, SN: 00c0ff192771000033f6b75801000000) (used percentage: 9.99%, threshold percentage: 10%) (pages used: 14112, total pages: 141124)
+
+Success: Command completed successfully. (2017-03-02 11:50:47)
+
+
+Scenario 2:-
+-------------
+1.Created Pool-A with size 591.9GB [ OverCommit Enabled ]
+2.Created Pool-B with size 591.9GB [ OverCommit Diabled ]
+3.Created a volume from Pool-A with size 699.9GB [Over commited volume]
+4.Created a volume from Pool-B with size 589.6GB
+5.Started Copying data into volumes and got below events when filled the volume with data
+6.Got 462 events  with  " INFORMATIONAL " type  for  all low,mid and high thresholds in Controller-B [ No Warning, Criticla Events Generated ]
+7.Got 462 event  with " INFORMATIONAL "  type for low  thresholds and  "Warning" type  for  mid and high thresholds in Controller-A [ No Warning, Criticla Events Generated ]
+8.Recorded the Results
+
+
+# show pools
+Name Serial Number                    Class    Total Size Avail  Snap Size OverCommit  Disk Groups Volumes  Low Thresh  Mid Thresh  High Thresh  Sec Fmt   Health
+  Reason
+  Action                                                                                                                                                                          
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+A    00c0ff192771000065f1b75801000000 Virtual  591.9GB    51.6GB 0B        Enabled     1           1        50.00 %     75.00 %     76.00 %      512n      Degraded
+  The virtual pool space high threshold has been exceeded.
+  - Add a disk group, or remove data from the pool to reduce the space usage below the high threshold. Do not shut down or remove the controller modules until space usage is below the high threshold.
+B    00c0ff19ed8b000079f1b75801000000 Virtual  591.9GB    71.3MB 0B        Disabled    1           1        50.00 %     75.00 %     76.00 %      512n      OK
+                                                                                                                                                                                
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Success: Command completed successfully. (2017-03-02 15:20:44)
+
+
+# show volumes
+Pool Name           Total Size Alloc Size Class    Type Health Reason Action
+-----------------------------------------------------------------------------
+B    Over_Comit_Di  589.6GB    589.6GB    Virtual  base OK
+A    Over_Comit_EN  699.9GB    539.8GB    Virtual  base OK
+-----------------------------------------------------------------------------
+Success: Command completed successfully. (2017-03-02 15:20:49)
+
+
+# show events last 6
+2017-03-02 13:08:07 [462]  #A193:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller A WARNING A virtual pool exceeded its high page threshold of 76%. (pool: A, SN: 00c0ff192771000065f1b75801000000) (amount used: 107255 of 141124 pages, or 76%)
+2017-03-02 13:07:25 [462]  #A191:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller A WARNING A virtual pool exceeded its mid page threshold of 75%. (pool: A, SN: 00c0ff192771000065f1b75801000000) (amount used: 105844 of 141124 pages, or 75%)
+2017-03-02 12:49:58 [462]  #A190:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller A INFORMATIONAL A virtual pool exceeded its low page threshold of 50%. (pool: A, SN: 00c0ff192771000065f1b75801000000) (amount used: 70563 of 141124 pages, or 50%)
+
+2017-03-02 13:06:30 [462]  #B224:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller B INFORMATIONAL A virtual pool exceeded its high page threshold of 76%. (pool: B, SN: 00c0ff19ed8b000079f1b75801000000) (amount used: 107255 of 141124 pages, or 76%)
+2017-03-02 13:05:47 [462]  #B223:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller B INFORMATIONAL A virtual pool exceeded its mid page threshold of 75%. (pool: B, SN: 00c0ff19ed8b000079f1b75801000000) (amount used: 105844 of 141124 pages, or 75%)
+2017-03-02 12:47:58 [462]  #B222:  MSA 2040 SAS Array SN#00C0FF19ED8B Controller B INFORMATIONAL A virtual pool exceeded its low page threshold of 50%. (pool: B, SN: 00c0ff19ed8b000079f1b75801000000) (amount used: 70563 of 141124 pages, or 50%)
+
+Success: Command completed successfully. (2017-03-02 15:23:57)
+
+
+
+
+##########################################
+
+SNAPSHOT:-
+---------
+
+Verified using Build: GL221R020-02
+
+Tested on EX controller with Lenovo branded system
+1. Created 32 volumes of 100GB on each pool.
+2. Mapped to the windows host.
+3. Started the IO using the x-file tool
+4. Started the script which creates snapshots on each volume with retention count 15 every 30 minutes.
+5. Observed for 24 hrs. Did not see any IO errors or controller crash.
+Attached are the logs.
+ 
+
